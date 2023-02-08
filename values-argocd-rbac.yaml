@@ -38,4 +38,4 @@ argo-cd:
             userHeader: X-Teleport-User # default is X-Remote-User
             groupHeader: X-Teleport-Group # default is X-Remote-Group
 
-some_test: "BBBB"
+some_test: "EEEE"
