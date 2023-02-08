@@ -1,0 +1,41 @@
+argo-cd:
+  server:
+    rbacConfig:
+      policy.csv: |
+        p, role:org-admin, applications, *, */*, allow
+        p, role:org-admin, projects, get, *, allow
+        p, role:org-admin, clusters, get, *, allow
+        p, role:org-admin, repositories, get, *, allow
+        p, role:org-dev, applications, sync, firefly/*, allow
+        p, role:org-dev, applications, sync, trifacta-saas/*, allow
+        p, role:org-dev, applications, sync, platform-services/*, allow
+        p, role:org-dev, applications, sync, appbuilder/*, allow
+        p, role:org-dev, applications, sync, spatial/*, allow
+        p, role:org-dev, applications, delete, firefly/*, allow
+        p, role:org-dev, applications, delete, trifacta-saas/*, allow
+        p, role:org-dev, applications, delete, platform-services/*, allow
+        p, role:org-dev, applications, delete, appbuilder/*, allow
+        p, role:org-dev, applications, delete, spatial/*, allow
+        g, "5932d7e3-113f-4aac-9aa1-286d76009216", role:org-admin
+        g, "657da84f-3f30-4a2e-9cd3-6f03bf37c59a", role:org-admin
+        g, "aa0976f8-9731-4111-9d02-8008b6578557", role:org-admin
+        g, "org-admin", role:org-admin
+        g, "0e162693-5368-4978-9feb-24e3f7576e8f", role:org-dev
+        g, "feb412dd-371e-48ae-83ee-71807187484c", role:org-dev
+        p, CurlBot, applications, get, */*, allow
+      policy.default: role:readonly
+    config:
+#     url: defined_with_terraform, do NOT set it here.
+      dex.config: |
+        logger:
+          level: debug
+          format: json
+        connectors:
+        - type: authproxy
+          id: teleporthttpheader
+          name: Teleport HTTP Header
+          config:
+            userHeader: X-Teleport-User # default is X-Remote-User
+            groupHeader: X-Teleport-Group # default is X-Remote-Group
+
+some_test: "BBBB"

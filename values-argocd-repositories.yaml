@@ -1,0 +1,18 @@
+argo-cd:
+
+  server:
+    configEnabled: "true"
+    config:
+      repositories: |
+        - type: helm
+          name: argocd
+          url: https://argoproj.github.io/argo-helm
+
+        - type: helm
+          name: external-secrets
+          url: https://charts.external-secrets.io
+
+        - type: helm
+          name: emberstack
+          url: https://emberstack.github.io/helm-charts
+

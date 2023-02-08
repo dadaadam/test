@@ -1,0 +1,79 @@
+argo-cd:
+
+  server:
+    extraArgs:
+      - --insecure
+      - --loglevel=debug
+    config:
+
+      application.instanceLabelKey: argocd.argoproj.io/instance
+
+      logLevel: trace
+
+      configManagementPlugins: |
+        - name: helm_oci
+          init:
+            command: ["/bin/sh"]
+            args: ["-c", "/usr/local/bin/helmsetup.sh"]
+          generate:
+            command: ["/bin/sh"]
+            args: ["-c", "/usr/local/bin/helmtemplate.sh"]
+
+  repoServer:
+    extraArgs:
+      - "--repo-cache-expiration 2m0s"
+    replicas: 2
+    logLevel: debug
+
+    env:
+    - name: ARGOCD_EXEC_TIMEOUT
+      value: 5m
+    - name: HELM_REGISTRY_CONFIG
+      value: /helm-working-dir/registry-wif/config.json
+
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPUUtilizationPercentage: 75
+      targetMemoryUtilizationPercentage: 75
+
+    resources:
+      limits:
+        cpu: 500m
+        memory: 1024Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+    volumes:
+    - name: plugin-scripts
+      configMap:
+        name: plugin-scripts
+        defaultMode: 0755
+    - name: ayx-argocd-scripts
+      configMap:
+        name: ayx-argocd-scripts
+        defaultMode: 0755
+    - name: custom-tools
+      emptyDir: {}
+    - name: helm-oci-auths
+      secret:
+        secretName: ayx-argocd-helm-oci-auths
+        optional: false
+        items:
+        - key: helm_registry_config.json
+          path: config.json
+
+    volumeMounts:
+    - mountPath: /usr/local/bin/helmsetup.sh
+      name: plugin-scripts
+      subPath: helmsetup.sh
+      readOnly: true
+    - mountPath: /usr/local/bin/helmtemplate.sh
+      name: plugin-scripts
+      subPath: helmtemplate.sh
+      readOnly: true
+    - mountPath: /helm-working-dir/registry-wif
+      name: helm-oci-auths
+      readOnly: true
